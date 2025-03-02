@@ -1,6 +1,7 @@
 const multer = require("multer");
 const { uploadToS3 } = require("../services/s3Service");
 
+// Set up Multer for file handling
 const upload = multer({ storage: multer.memoryStorage() });
 
 const handleUpload = async (req, res) => {

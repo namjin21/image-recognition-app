@@ -1,20 +1,26 @@
-const AWS = require("aws-sdk");
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { v4: uuidv4 } = require("uuid");
 
-AWS.config.update({ region: process.env.AWS_REGION });
-const s3 = new AWS.S3();
+const s3 = new S3Client({ region: process.env.AWS_REGION });
 
 const uploadToS3 = async (fileBuffer, fileName, mimeType) => {
-    const fileKey = `uploads/${uuidv4()}-${fileName}`;
+    const fileKey = `${uuidv4()}-${fileName}`;
 
-    await s3.putObject({
-        Bucket: process.env.S3_BUCKET,
+    const params = {
+        Bucket: process.env.S3_BUCKET_NAME,
         Key: fileKey,
         Body: fileBuffer,
         ContentType: mimeType,
-    }).promise();
+    };
 
-    return fileKey;
+    try {
+        const command = new PutObjectCommand(params);
+        await s3.send(command);
+        return fileKey;
+    } catch (error) {
+        console.error("Error uploading to S3:", error);
+        throw error;
+    }
 };
 
 module.exports = { uploadToS3 };
