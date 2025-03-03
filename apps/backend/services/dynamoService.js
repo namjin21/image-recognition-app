@@ -9,9 +9,11 @@ const dynamoDB = DynamoDBDocumentClient.from(client);
 
 const TABLE_NAME = process.env.DYNAMODB_TABLE;
 
-const storeMetadata = async (fileKey, labels) => {
+const storeMetadata = async (imageId, s3Key, originalFileName, labels) => {
     const metadata = {
-        imageId: fileKey,
+        imageId,
+        s3Key,
+        originalFileName,
         labels,
         uploadedAt: new Date().toISOString(),
     };
@@ -25,10 +27,10 @@ const storeMetadata = async (fileKey, labels) => {
     return metadata;
 };
 
-const getMetadata = async (fileKey) => {
+const getMetadata = async (imageId) => {
     const command = new GetCommand({
         TableName: TABLE_NAME,
-        Key: { imageId: fileKey },
+        Key: { imageId: imageId },
     })
 
     result = await dynamoDB.send(command);

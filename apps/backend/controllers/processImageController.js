@@ -3,13 +3,13 @@ const { storeMetadata } = require("../services/dynamoService");
 
 const processImage = async (req, res) => {
     try {
-        const { fileKey } = req.body;
-        if (!fileKey) {
-            return res.status(400).json({ error: "Missing file key" });
+        const { imageId, s3Key, originalFileName } = req.body;
+        if (!imageId) {
+            return res.status(400).json({ error: "Missing partition key: imageId" });
         }
 
-        const labels = await analyzeImage(fileKey, process.env.S3_BUCKET);
-        const metadata = await storeMetadata(fileKey, labels);
+        const labels = await analyzeImage(imageId);
+        const metadata = await storeMetadata(imageId, s3Key, originalFileName, labels);
         res.json({ message: "Image processed", metadata });
     } catch (error) {
         console.error("Error processing image:", error);
