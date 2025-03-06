@@ -1,5 +1,6 @@
 const multer = require("multer");
 const { uploadToS3 } = require("../services/s3Service");
+const { storeInitialMetadata } = require("../services/dynamoService")
 
 // Set up Multer for file handling
 const upload = multer({ storage: multer.memoryStorage() });
@@ -10,6 +11,8 @@ const handleUpload = async (req, res) => {
 
         const { originalname, buffer, mimetype } = req.file;
         const { uniqueId, s3Key } = await uploadToS3(buffer, originalname, mimetype);
+        
+        await storeInitialMetadata(uniqueId, s3Key, originalname)
 
         res.status(200).json({ 
             message: "Image uploaded successfully",
