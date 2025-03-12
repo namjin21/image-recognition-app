@@ -35,7 +35,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
                 : "2px solid red",
           }}
         >
-          <img src={image.url} alt="preview" width={200} height={200} />
+          <img src={image.url} alt="preview" width={200} height={200} onClick={() => onImageClick(image)} />
           <button
             onClick={() => onProcessImage(image.id)}
             disabled={image.status === "processed"}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import FileInput from "./FileInput";
 import ImageGrid from "./ImageGrid";
+import ImagePopup from "./ImagePopup";
 
 interface ImageData {
   id: string;
@@ -14,19 +15,19 @@ const ImageUpload = () => {
   const [images, setImages] = useState<ImageData[]>([]);
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
 
   // Handle file selection & auto-upload
   const handleFileUpload = async (files: FileList | null) => {
-    const uploadedImages: ImageData[] = [];
-    setUploading(true);
-
     if (!files) {
       console.log("No files to upload");
       return;
     }
 
-    const fileArray = Array.from(files);
+    setUploading(true);
+    const uploadedImages: ImageData[] = [];
 
+    const fileArray = Array.from(files);
     for (const file of fileArray) {
       const formData = new FormData();
       formData.append("images", file);
@@ -39,7 +40,6 @@ const ImageUpload = () => {
             headers: { "Content-Type": "multipart/form-data" },
           }
         );
-        console.log(response.data.images);
 
         uploadedImages.push({
           id: response.data.images[0].imageId,
@@ -93,8 +93,14 @@ const ImageUpload = () => {
     }
   };
 
+  // Open popup with selected image
   const handleImageClick = (image: ImageData) => {
-    console.log("Clicked image:", image);
+    setSelectedImage(image);
+  };
+
+  // Close popup
+  const handleClosePopup = () => {
+    setSelectedImage(null);
   };
 
   return (
@@ -113,6 +119,10 @@ const ImageUpload = () => {
       >
         {processing ? "Processing..." : "Process All"}
       </button>
+
+      {/* Image Popup */}
+
+      {selectedImage && <ImagePopup image={selectedImage} onClose={handleClosePopup} />}
     </div>
   );
 };
