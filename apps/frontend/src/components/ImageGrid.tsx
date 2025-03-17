@@ -16,26 +16,13 @@ const ImageGrid: React.FC<ImageGridProps> = ({
   onImageClick,
 }) => {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, 200px)",
-        gap: "10px",
-        marginTop: "10px",
-      }}
-    >
+    <div className="columns-3 gap-4">
       {images.map((image) => (
         <div
           key={image.id}
-          style={{
-            position: "relative",
-            border:
-              image.status === "processed"
-                ? "2px solid green"
-                : "2px solid red",
-          }}
+          className="relative mb-4 break-inside-avoid"
         >
-          <img src={image.url} alt="preview" width={200} height={200} onClick={() => onImageClick(image)} />
+          <img className="w-full h-auto object-cover rounded-md shadow" src={image.url} alt="preview" width={200} height={200} onClick={() => onImageClick(image)} />
           <button
             onClick={() => onProcessImage(image.id)}
             disabled={image.status === "processed"}

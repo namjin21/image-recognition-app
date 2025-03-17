@@ -104,13 +104,9 @@ const ImageUpload = () => {
   };
 
   return (
-    <div>
+    <div className="m-5">
       <FileInput onChange={handleFileUpload} disabled={uploading} />
-      <ImageGrid
-        images={images}
-        onProcessImage={handleProcessImage}
-        onImageClick={handleImageClick}
-      />
+      
       <button
         onClick={handleProcessAll}
         disabled={
@@ -119,9 +115,14 @@ const ImageUpload = () => {
       >
         {processing ? "Processing..." : "Process All"}
       </button>
+      
+      <ImageGrid
+        images={images}
+        onProcessImage={handleProcessImage}
+        onImageClick={handleImageClick}
+      />
 
       {/* Image Popup */}
-
       {selectedImage && <ImagePopup image={selectedImage} onClose={handleClosePopup} />}
     </div>
   );
