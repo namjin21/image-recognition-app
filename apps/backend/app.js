@@ -1,5 +1,7 @@
 require("dotenv").config();
 
+const { authenticateUser } = require("./utils/authMiddleware");
+
 const express = require("express");
 const cors = require("cors");
 const serverless = require("serverless-http");
@@ -16,7 +18,7 @@ const uploadRoute = require("./routes/uploadImageRoute");
 const processRoute = require("./routes/processImageRoute");
 const metadataRoute = require("./routes/metadataRoute");
 
-app.use("/upload", uploadRoute);
+app.use("/upload", authenticateUser, uploadRoute);
 app.use("/process", processRoute);
 app.use("/metadata", metadataRoute);
 

@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useUser } from "../context/UserContext";
+
 import axios from "axios";
 import FileInput from "./FileInput";
 import ImageGrid from "./ImageGrid";
@@ -11,11 +13,29 @@ interface ImageData {
   status: "pending" | "processed";
 }
 
-const ImageUpload = () => {
+const ImageUpload = () => { 
+  const { userId, loading, idToken } = useUser();
+  console.log(userId);
   const [images, setImages] = useState<ImageData[]>([]);
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const res = await axios.get(`http://localhost:3001/metadata/all/${userId}`);
+        console.log(res.data)
+        setImages((prevImages) => [...prevImages, ...res.data]);
+      } catch (error) {
+        console.log('Error fetching images:', error);
+      }
+    }
+
+    if (!loading && userId) {
+      fetchImages();
+    }
+  }, [loading, userId]);
 
   // Handle file selection & auto-upload
   const handleFileUpload = async (files: FileList | null) => {
@@ -37,7 +57,10 @@ const ImageUpload = () => {
           "http://localhost:3001/upload",
           formData,
           {
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${idToken}`,
+            },
           }
         );
 
@@ -46,7 +69,6 @@ const ImageUpload = () => {
           url: URL.createObjectURL(file), // Local preview
           status: "pending",
         });
-        console.log(uploadedImages);
       } catch (error) {
         console.error("Upload failed:", error);
       }
@@ -106,7 +128,7 @@ const ImageUpload = () => {
   return (
     <div className="m-5">
       <FileInput onChange={handleFileUpload} disabled={uploading} />
-      
+
       <button
         onClick={handleProcessAll}
         disabled={
@@ -115,7 +137,7 @@ const ImageUpload = () => {
       >
         {processing ? "Processing..." : "Process All"}
       </button>
-      
+
       <ImageGrid
         images={images}
         onProcessImage={handleProcessImage}
@@ -123,7 +145,9 @@ const ImageUpload = () => {
       />
 
       {/* Image Popup */}
-      {selectedImage && <ImagePopup image={selectedImage} onClose={handleClosePopup} />}
+      {selectedImage && (
+        <ImagePopup image={selectedImage} onClose={handleClosePopup} />
+      )}
     </div>
   );
 };
