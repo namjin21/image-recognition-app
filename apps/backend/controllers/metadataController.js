@@ -1,16 +1,28 @@
-const { getMetadata } = require("../services/dynamoService");
+const { getMetadata, getAllMetadata } = require("../services/dynamoService");
 
 const fetchMetadata = async (req, res) => {
     try {
-        const { imageId } = req.query;
+        const { imageId } = req.params;
         if (!imageId) return res.status(400).json({ error: "Missing imageId" });
 
         const metadata = await getMetadata(imageId);
-        res.json(metadata || { message: "No metadata found" });
+        res.json(metadata || { message: `No metadata found for imageId: ${imageId}` });
 
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-module.exports = { fetchMetadata };
+const fetchAllMetadata = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        if (!userId) return res.status(400).json({ error: "Missing userId" });
+    
+        const allMetadata = await getAllMetadata(userId);
+        res.json(allMetadata || { message: `No metadata found for userId: ${userId}` })
+    } catch (error) {
+        res.status(500).json({ error: 'Could not retrieve images for user' });
+    }
+};
+
+module.exports = { fetchMetadata, fetchAllMetadata };

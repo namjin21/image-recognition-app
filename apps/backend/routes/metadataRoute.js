@@ -1,7 +1,8 @@
 const express = require("express");
-const { fetchMetadata } = require("../controllers/metadataController");
+const { fetchMetadata, fetchAllMetadata } = require("../controllers/metadataController");
 
 const router = express.Router();
-router.get("/", fetchMetadata);
+router.get("/:imageId", fetchMetadata);
+router.get("/all/:userId", fetchAllMetadata);
 
 module.exports = router;
