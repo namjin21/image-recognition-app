@@ -2,17 +2,20 @@ const {
   RekognitionClient,
   DetectLabelsCommand,
 } = require("@aws-sdk/client-rekognition");
+const { getS3Key } = require("./dynamoService");
 
 // Initialize the Rekognition client
 const rekognition = new RekognitionClient({ region: process.env.AWS_REGION });
 
-const analyzeImage = async (imageId) => {
+const analyzeImage = async (userId, imageId) => {
   try {
+    const s3Key = await getS3Key(userId, imageId);
+  
     const params = {
       Image: {
         S3Object: {
           Bucket: process.env.S3_BUCKET_NAME, // Ensure this is defined
-          Name: imageId, // The key of the image in S3
+          Name: s3Key, // The key of the image in S3
         },
       },
       MaxLabels: 10, // Limit the number of labels returned

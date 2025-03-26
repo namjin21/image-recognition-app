@@ -100,6 +100,7 @@ const ImageUpload = () => {
   const handleProcessImage = async (imageId: string) => {
     try {
       const res = await axios.post(`http://localhost:3001/process`, {
+        userId,
         imageId,
       });
       console.log(res.data.labels);

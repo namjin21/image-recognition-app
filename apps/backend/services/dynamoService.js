@@ -45,10 +45,10 @@ const storeInitialMetadata = async (
   }
 };
 
-const setLabels = async (imageId, labels) => {
+const setLabels = async (userId, imageId, labels) => {
   const params = {
     TableName: TABLE_NAME,
-    Key: { imageId },
+    Key: {  userId, imageId },
     UpdateExpression: "SET processStatus = :processStatus, labels = :labels",
     ExpressionAttributeValues: {
       ":processStatus": "processed",
@@ -84,10 +84,10 @@ const updateStatus = async (imageId, processStatus) => {
   }
 };
 
-const getMetadata = async (imageId) => {
+const getMetadata = async (userId, imageId) => {
   const command = new GetCommand({
     TableName: TABLE_NAME,
-    Key: { imageId },
+    Key: { userId, imageId },
   });
 
   result = await dynamoDB.send(command);
@@ -118,7 +118,7 @@ const getAllMetadata = async (userId) => {
           id: item.imageId,
           url: signedUrl,
           labels: item.labels || [],
-          status: item.status || "pending",
+          status: item.processStatus || "pending",
         }
       })
     );
@@ -129,10 +129,25 @@ const getAllMetadata = async (userId) => {
   }
 };
 
+const getS3Key = async (userId, imageId) => {
+  const command = new GetCommand({
+    TableName: TABLE_NAME,
+    Key: { userId, imageId },
+  });
+
+  try {
+    result = await dynamoDB.send(command);
+    return result.Item.s3Key;
+  } catch (error) {
+    console.error("Error getting s3 key:", error);
+  }
+}
+
 module.exports = {
   storeInitialMetadata,
   setLabels,
   updateStatus,
   getMetadata,
   getAllMetadata,
+  getS3Key,
 };

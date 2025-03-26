@@ -2,10 +2,11 @@ const { getMetadata, getAllMetadata } = require("../services/dynamoService");
 
 const fetchMetadata = async (req, res) => {
     try {
-        const { imageId } = req.params;
+        const { userId, imageId } = req.params;
+        if (!userId) return res.status(400).json({ error: "Missing userId" });
         if (!imageId) return res.status(400).json({ error: "Missing imageId" });
 
-        const metadata = await getMetadata(imageId);
+        const metadata = await getMetadata(userId, imageId);
         res.json(metadata || { message: `No metadata found for imageId: ${imageId}` });
 
     } catch (error) {
