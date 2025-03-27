@@ -13,9 +13,8 @@ interface ImageData {
   status: "pending" | "processed";
 }
 
-const ImageUpload = () => { 
+const ImageUpload = () => {
   const { userId, loading, idToken } = useUser();
-  console.log(userId);
   const [images, setImages] = useState<ImageData[]>([]);
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -24,13 +23,15 @@ const ImageUpload = () => {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const res = await axios.get(`http://localhost:3001/metadata/all/${userId}`);
-        console.log(res.data)
+        const res = await axios.get(
+          `http://localhost:3001/metadata/all/${userId}`
+        );
+        console.log(res.data);
         setImages((prevImages) => [...prevImages, ...res.data]);
       } catch (error) {
-        console.log('Error fetching images:', error);
+        console.log("Error fetching images:", error);
       }
-    }
+    };
 
     if (!loading && userId) {
       fetchImages();
@@ -45,37 +46,38 @@ const ImageUpload = () => {
     }
 
     setUploading(true);
-    const uploadedImages: ImageData[] = [];
-
     const fileArray = Array.from(files);
-    for (const file of fileArray) {
+
+    try {
       const formData = new FormData();
-      formData.append("images", file);
+      fileArray.forEach((file) => formData.append("images", file));
 
-      try {
-        const response = await axios.post(
-          "http://localhost:3001/upload",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${idToken}`,
-            },
-          }
-        );
+      const response = await axios.post(
+        "http://localhost:3001/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      );
 
-        uploadedImages.push({
-          id: response.data.images[0].imageId,
-          url: URL.createObjectURL(file), // Local preview
+      const uploadedImages: ImageData[] = response.data.images.map(
+        (image: any) => ({
+          id: image.imageId,
+          url: image.presignedUrl,
           status: "pending",
-        });
-      } catch (error) {
-        console.error("Upload failed:", error);
-      }
-    }
+        })
+      );
+      console.log(uploadedImages);
 
-    setUploading(false);
-    setImages((prevImages) => [...prevImages, ...uploadedImages]);
+      setImages((prevImages) => [...prevImages, ...uploadedImages]);
+    } catch (error) {
+      console.error("Upload failed:", error);
+    } finally {
+      setUploading(false);
+    }
   };
 
   // Process all unprocessed images
@@ -118,7 +120,9 @@ const ImageUpload = () => {
 
   // Open popup with selected image
   const handleImageClick = (image: ImageData) => {
-    setSelectedImage(image);
+    if (image.status === "processed") {
+      setSelectedImage(image);
+    }
   };
 
   // Close popup
@@ -131,6 +135,11 @@ const ImageUpload = () => {
       <FileInput onChange={handleFileUpload} disabled={uploading} />
 
       <button
+        className={`px-4 py-2 rounded ${
+          images.every((img) => img.status === "processed")
+            ? "bg-gray-300 text-gray-500 disabled"
+            : "bg-blue-500 text-white cursor-pointer hover:bg-blue-600"
+        }`}
         onClick={handleProcessAll}
         disabled={
           processing || images.every((img) => img.status === "processed")

@@ -21,7 +21,6 @@ const storeInitialMetadata = async (
   originalFileName,
   userId
 ) => {
-  console.log("I'm in storeInitialMetadata", "userId is ", userId);
   const metadata = {
     imageId,
     s3Key,
