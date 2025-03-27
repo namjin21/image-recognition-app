@@ -6,9 +6,10 @@ import FileInput from "./FileInput";
 import ImageGrid from "./ImageGrid";
 import ImagePopup from "./ImagePopup";
 
-interface ImageData {
+export interface ImageData {
   id: string;
   url: string;
+  originalFileName: string;
   labels?: string[];
   status: "pending" | "processed";
 }
@@ -21,6 +22,7 @@ const ImageUpload = () => {
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
 
   useEffect(() => {
+    console.log(userId)
     const fetchImages = async () => {
       try {
         const res = await axios.get(
@@ -66,6 +68,7 @@ const ImageUpload = () => {
       const uploadedImages: ImageData[] = response.data.images.map(
         (image: any) => ({
           id: image.imageId,
+          originalFileName: image.originalFileName,
           url: image.presignedUrl,
           status: "pending",
         })

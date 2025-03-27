@@ -116,6 +116,7 @@ const getAllMetadata = async (userId) => {
         return {
           id: item.imageId,
           url: signedUrl,
+          originalFileName: item.originalFileName,
           labels: item.labels || [],
           status: item.processStatus || "pending",
         }
