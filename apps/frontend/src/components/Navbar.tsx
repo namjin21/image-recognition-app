@@ -10,7 +10,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSignOut }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="flex items-center justify-between bg-white shadow-md px-6 py-4">
+    <nav className="flex items-center justify-between bg-gray-50 shadow-md px-6 py-4">
       <h2 className="header text-black font-black">Image Tagger</h2>
 
       {/* Profile Dropdown */}

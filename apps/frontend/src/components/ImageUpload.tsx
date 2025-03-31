@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
 
 import axios from "axios";
+import {debounce} from "lodash";
+
 import ImageGrid from "./ImageGrid";
 import ImagePopup from "./ImagePopup";
 
@@ -19,6 +21,7 @@ const ImageUpload = () => {
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
+  const [searchWord, setSearchWord] = useState("");
 
   useEffect(() => {
     console.log(userId);
@@ -132,13 +135,24 @@ const ImageUpload = () => {
     setSelectedImage(null);
   };
 
+  // Debounced search function to optimize performance
+  const handleSearch = debounce((event: any) => {
+    setSearchWord(event.target.value.toLowerCase());
+  }, 300); // 300ms debounce time
+
+  // Filter images based on search word
+  const filteredImages = images.filter(
+    (img) => !searchWord || img.labels?.some((label) => label.toLowerCase().includes(searchWord))
+  );
+
   return (
     <div className="m-4">
       <div className="flex gap-4 mb-4">
         <input
           type="text"
           placeholder="Search for an image tag..."
-          className="flex-grow px-4 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+          onChange={handleSearch}
+          className="grow px-4 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
         <button
           className={`px-4 py-2 rounded ${
@@ -156,7 +170,7 @@ const ImageUpload = () => {
       </div>
       
       <ImageGrid
-        images={images}
+        images={filteredImages}
         onProcessImage={handleProcessImage}
         onImageClick={handleImageClick}
         handleFileUpload={handleFileUpload}
