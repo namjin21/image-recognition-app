@@ -1,0 +1,38 @@
+import { useState } from "react";
+
+interface NavbarProps {
+  onSignOut: () => Promise<void>;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onSignOut }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <nav className="flex items-center justify-between bg-white shadow-md px-6 py-4">
+      <h2 className="header text-black font-black">Image Tagger</h2>
+
+      {/* Profile Dropdown */}
+      <div className="relative">
+        <button
+          className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          👤
+        </button>
+
+        {menuOpen && (
+          <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 shadow-lg rounded-md">
+            <button
+              className="block w-full text-left px-4 py-2 bg-white hover:bg-gray-100 text-black cursor-pointer"
+              onClick={onSignOut}
+            >
+              Sign Out
+            </button>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+}
+
+export default Navbar;

@@ -2,6 +2,7 @@ import "./App.css";
 import ImageUpload from "./components/ImageUpload";
 import { UserProvider } from "./context/UserContext";
 import { signOut } from "aws-amplify/auth";
+import Navbar from "./components/Navbar";
 
 function App() {
   const handleSignOut = async () => {
@@ -11,8 +12,8 @@ function App() {
   return (
     <>
       <UserProvider>
+        <Navbar onSignOut={handleSignOut} />
         <ImageUpload />
-        <button onClick={handleSignOut}>sign out</button>
       </UserProvider>
     </>
   );

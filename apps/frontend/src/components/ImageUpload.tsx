@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
 
 import axios from "axios";
-import FileInput from "./FileInput";
 import ImageGrid from "./ImageGrid";
 import ImagePopup from "./ImagePopup";
 
@@ -22,7 +21,7 @@ const ImageUpload = () => {
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
 
   useEffect(() => {
-    console.log(userId)
+    console.log(userId);
     const fetchImages = async () => {
       try {
         const res = await axios.get(
@@ -134,27 +133,34 @@ const ImageUpload = () => {
   };
 
   return (
-    <div className="m-5">
-      <FileInput onChange={handleFileUpload} disabled={uploading} />
-
-      <button
-        className={`px-4 py-2 rounded ${
-          images.every((img) => img.status === "processed")
-            ? "bg-gray-300 text-gray-500 disabled"
-            : "bg-blue-500 text-white cursor-pointer hover:bg-blue-600"
-        }`}
-        onClick={handleProcessAll}
-        disabled={
-          processing || images.every((img) => img.status === "processed")
-        }
-      >
-        {processing ? "Processing..." : "Process All"}
-      </button>
-
+    <div className="m-4">
+      <div className="flex gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Search for an image tag..."
+          className="flex-grow px-4 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+        />
+        <button
+          className={`px-4 py-2 rounded ${
+            images.every((img) => img.status === "processed")
+              ? "bg-gray-300 text-gray-500 disabled"
+              : "bg-green-500 text-white cursor-pointer hover:bg-green-600"
+          }`}
+          onClick={handleProcessAll}
+          disabled={
+            processing || images.every((img) => img.status === "processed")
+          }
+        >
+          {processing ? "Processing..." : "Process All"}
+        </button>
+      </div>
+      
       <ImageGrid
         images={images}
         onProcessImage={handleProcessImage}
         onImageClick={handleImageClick}
+        handleFileUpload={handleFileUpload}
+        uploading={uploading} 
       />
 
       {/* Image Popup */}

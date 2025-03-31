@@ -1,22 +1,33 @@
+import FileInput from "./FileInput";
 import { ImageData } from "./ImageUpload";
 
 interface ImageGridProps {
   images: ImageData[];
   onProcessImage: (imageId: string) => void;
   onImageClick: (image: ImageData) => void;
+  handleFileUpload: (files: FileList | null) => Promise<void>;
+  uploading: boolean;
 }
 
 const ImageGrid: React.FC<ImageGridProps> = ({
   images,
   onProcessImage,
   onImageClick,
+  handleFileUpload,
+  uploading,
 }) => {
   return (
-    <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-4 gap-4">
+    <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4">
+      {/* Upload Button (First Grid Item) */}
+      <FileInput onChange={handleFileUpload} disabled={uploading} />
+
+      {/* Uploaded Images */}
       {images.map((image) => (
         <div key={image.id} className="relative mb-4 break-inside-avoid">
           <img
-            className={`w-full h-auto object-cover rounded-xl shadow ${image.status === "pending" ? "opacity-50" : "cursor-pointer" }`}
+            className={`w-full h-auto object-cover rounded-xl shadow ${
+              image.status === "pending" ? "opacity-50" : "cursor-pointer"
+            }`}
             src={image.url}
             alt="preview"
             width={200}
