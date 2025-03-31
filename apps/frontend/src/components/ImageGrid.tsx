@@ -36,7 +36,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
           />
           {image.status === "pending" && (
             <button
-              className="absolute inset-0 m-auto w-30 h-10 bg-teal-500 text-white font-bold rounded shadow-lg hover:bg-teal-600 flex items-center justify-center cursor-pointer"
+              className="absolute inset-0 m-auto w-30 h-10 bg-cyan-500 text-white font-bold rounded shadow-lg hover:bg-cyan-600 flex items-center justify-center cursor-pointer"
               onClick={() => onProcessImage(image.id)}
             >
               Process

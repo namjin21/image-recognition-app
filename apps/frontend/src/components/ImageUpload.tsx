@@ -144,7 +144,7 @@ const ImageUpload = () => {
           className={`px-4 py-2 rounded ${
             images.every((img) => img.status === "processed")
               ? "bg-gray-300 text-gray-500 disabled"
-              : "bg-green-500 text-white cursor-pointer hover:bg-green-600"
+              : "bg-cyan-600 text-white cursor-pointer hover:bg-cyan-700"
           }`}
           onClick={handleProcessAll}
           disabled={

@@ -4,6 +4,7 @@ import { getCurrentUser, fetchUserAttributes, fetchAuthSession } from 'aws-ampli
 interface UserContextType {
   userId: string | null;
   email: string | null;
+  username: string | null;
   loading: boolean;
   idToken: string | null;
   refreshUser: () => Promise<void>;
@@ -12,6 +13,7 @@ interface UserContextType {
 const UserContext = createContext<UserContextType>({
   userId: null,
   email: null,
+  username: null,
   loading: true,
   idToken: null,
   refreshUser: async () => {},
@@ -20,6 +22,7 @@ const UserContext = createContext<UserContextType>({
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [idToken, setIdToken] = useState<string | null>(null);
 
@@ -28,6 +31,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const user = await getCurrentUser();
       setUserId(user.userId);
+      setUsername(user.username);
 
       const attributes = await fetchUserAttributes();
       setEmail(attributes.email || null);
@@ -39,6 +43,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err) {
       console.log('No authenticated user:', err);
       setUserId(null);
+      setUsername(null);
       setEmail(null);
       setIdToken(null);
     } finally {
@@ -55,6 +60,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         userId,
         email,
+        username,
         loading,
         idToken,
         refreshUser: fetchUser,
