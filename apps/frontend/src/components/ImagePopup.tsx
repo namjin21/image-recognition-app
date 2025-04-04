@@ -29,7 +29,7 @@ const ImagePopup: React.FC<ImagePopupProps> = ({ image, onClose }) => {
               <span className="bg-blue-500 text-white text-xs font-semibold mx-0.5 my-0.5 px-2 py-1 rounded inline-block whitespace-nowrap" key={index}>{label}</span>
             ))
           ) : (
-            <p>No labels available</p>
+            <p className="text-black">No labels available</p>
           )}
         </div>
       </div>

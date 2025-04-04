@@ -15,11 +15,13 @@ export interface ImageData {
   status: "pending" | "processed";
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const ImageUpload = () => {
   const { userId, loading, idToken } = useUser();
   const [images, setImages] = useState<ImageData[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [processing, setProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
   const [searchWord, setSearchWord] = useState("");
 
@@ -28,7 +30,7 @@ const ImageUpload = () => {
     const fetchImages = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3001/metadata/all/${userId}`
+          `${API_BASE_URL}/metadata/all/${userId}`
         );
         console.log(res.data);
         setImages((prevImages) => [...prevImages, ...res.data]);
@@ -57,7 +59,7 @@ const ImageUpload = () => {
       fileArray.forEach((file) => formData.append("images", file));
 
       const response = await axios.post(
-        "http://localhost:3001/upload",
+        `${API_BASE_URL}/upload`,
         formData,
         {
           headers: {
@@ -92,21 +94,23 @@ const ImageUpload = () => {
     );
     if (unprocessedImages.length === 0) return alert("No unprocessed images");
 
-    setProcessing(true);
+    setIsProcessing(true);
 
-    await Promise.all(
-      unprocessedImages.map(async (image) => {
-        handleProcessImage(image.id);
-      })
-    );
-
-    setProcessing(false);
+    try {
+      await Promise.all(
+        unprocessedImages.map(async (image) => {
+          await handleProcessImage(image.id);
+        })
+      );
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   // Process a single image
   const handleProcessImage = async (imageId: string) => {
     try {
-      const res = await axios.post(`http://localhost:3001/process`, {
+      const res = await axios.post(`${API_BASE_URL}/process`, {
         userId,
         imageId,
       });
@@ -162,10 +166,10 @@ const ImageUpload = () => {
           }`}
           onClick={handleProcessAll}
           disabled={
-            processing || images.every((img) => img.status === "processed")
+            isProcessing || images.every((img) => img.status === "processed")
           }
         >
-          {processing ? "Processing..." : "Process All"}
+          {isProcessing ? "Processing..." : "Process All"}
         </button>
       </div>
       
