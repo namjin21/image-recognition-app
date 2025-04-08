@@ -9,15 +9,15 @@ const ImagePopup: React.FC<ImagePopupProps> = ({ image, onClose }) => {
   if (!image) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/85 flex justify-center items-center">
-      <div className="bg-white p-4 rounded-lg shadow-lg w-[400px]">
+    <div className="fixed inset-0 bg-black/85 flex justify-center items-center px-4" onClick={onClose}>
+      <div className="relative bg-white p-4 rounded-lg shadow-lg w-[400px] max-w-[90%]" onClick={(e) => e.stopPropagation()}>
         <button
-          className="absolute top-2 right-2 text-gray-500 px-2 py-1 rounded-sm cursor-pointer hover:bg-red-500"
+          className="absolute top-3 right-2.5 text-gray-500 px-2 py-1 rounded-sm cursor-pointer hover:bg-gray-200"
           onClick={onClose}
         >
           ✖
         </button>
-        <div className="text-lg font-semibold text-gray-700 pb-2 border-b border-gray-300">{image.originalFileName}</div>
+        <div className="text-lg font-semibold text-gray-700 pb-2 pr-8 break-words border-b border-gray-300">{image.originalFileName}</div>
         <img
           src={image.url}
           alt="Full View"
