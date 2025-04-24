@@ -17,4 +17,5 @@ const amplifyConfig: ResourcesConfig = {
     },
   },
 };
+
 export default amplifyConfig;

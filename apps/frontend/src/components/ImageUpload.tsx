@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
 
 import axios from "axios";
-import {debounce} from "lodash";
+import { debounce } from "lodash";
 
 import ImageGrid from "./ImageGrid";
 import ImagePopup from "./ImagePopup";
@@ -29,9 +29,7 @@ const ImageUpload = () => {
     console.log(userId);
     const fetchImages = async () => {
       try {
-        const res = await axios.get(
-          `${API_BASE_URL}/metadata/all/${userId}`
-        );
+        const res = await axios.get(`${API_BASE_URL}/metadata/all/${userId}`);
         console.log(res.data);
         setImages((prevImages) => [...prevImages, ...res.data]);
       } catch (error) {
@@ -58,16 +56,12 @@ const ImageUpload = () => {
       const formData = new FormData();
       fileArray.forEach((file) => formData.append("images", file));
 
-      const response = await axios.post(
-        `${API_BASE_URL}/upload`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${idToken}`,
-          },
-        }
-      );
+      const response = await axios.post(`${API_BASE_URL}/upload`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
 
       const uploadedImages: ImageData[] = response.data.images.map(
         (image: any) => ({
@@ -146,23 +140,25 @@ const ImageUpload = () => {
 
   // Filter images based on search word
   const filteredImages = images.filter(
-    (img) => !searchWord || img.labels?.some((label) => label.toLowerCase().includes(searchWord))
+    (img) =>
+      !searchWord ||
+      img.labels?.some((label) => label.toLowerCase().includes(searchWord))
   );
 
   return (
     <div className="m-4">
-      <div className="flex gap-4 mb-4">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4 w-full">
         <input
           type="text"
           placeholder="Search for an image tag..."
           onChange={handleSearch}
-          className="grow px-4 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full sm:grow px-4 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
         <button
-          className={`px-4 py-2 rounded ${
+          className={`whitespace-nowrap min-w-max px-4 py-2 rounded ${
             images.every((img) => img.status === "processed")
-              ? "bg-gray-300 text-gray-500 disabled"
-              : "bg-cyan-600 text-white cursor-pointer hover:bg-cyan-700"
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-cyan-600 text-white hover:bg-cyan-700"
           }`}
           onClick={handleProcessAll}
           disabled={
@@ -172,13 +168,13 @@ const ImageUpload = () => {
           {isProcessing ? "Processing..." : "Process All"}
         </button>
       </div>
-      
+
       <ImageGrid
         images={filteredImages}
         onProcessImage={handleProcessImage}
         onImageClick={handleImageClick}
         handleFileUpload={handleFileUpload}
-        uploading={uploading} 
+        uploading={uploading}
       />
 
       {/* Image Popup */}
