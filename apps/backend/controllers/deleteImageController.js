@@ -18,7 +18,7 @@ const deleteImages = async (req, res) => {
     );
 
     await deleteImagesFromS3(s3Keys);
-    await deleteImagesMetadata(imageIds);
+    await deleteImagesMetadata(imageIds, userId);
 
     return res.json({ message: `Images deleted successfully for user ${userId}` });
   } catch (error) {

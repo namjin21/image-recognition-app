@@ -1,4 +1,4 @@
-const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient, BatchWriteItemCommand } = require("@aws-sdk/client-dynamodb");
 const {
   DynamoDBDocumentClient,
   PutCommand,
@@ -143,7 +143,7 @@ const getS3Key = async (userId, imageId) => {
   }
 };
 
-const deleteImagesMetadata = async (imageIds) => {
+const deleteImagesMetadata = async (imageIds, userId) => {
   const deleteRequests = imageIds.map((imageId) => ({
     DeleteRequest: {
       Key: { userId: { S: userId }, imageId: { S: imageId } },

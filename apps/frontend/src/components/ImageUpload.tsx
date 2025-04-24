@@ -4,6 +4,7 @@ import { useUser } from "../context/UserContext";
 import axios from "axios";
 import { debounce } from "lodash";
 
+import FunctionBar from "./FunctionBar";
 import ImageGrid from "./ImageGrid";
 import ImagePopup from "./ImagePopup";
 
@@ -24,6 +25,8 @@ const ImageUpload = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
   const [searchWord, setSearchWord] = useState("");
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedImageIds, setSelectedImageIds] = useState<string[]>([]);
 
   useEffect(() => {
     console.log(userId);
@@ -145,29 +148,52 @@ const ImageUpload = () => {
       img.labels?.some((label) => label.toLowerCase().includes(searchWord))
   );
 
+  const handleDeleteSelected = async () => {
+    if (!userId || selectedImageIds.length === 0) return;
+
+    try {
+      await axios.delete(`${API_BASE_URL}/images/${userId}`, {
+        data: { imageIds: selectedImageIds },
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+
+      // Remove deleted images from state
+      setImages((prev) =>
+        prev.filter((img) => !selectedImageIds.includes(img.id))
+      );
+      setSelectionMode(false);
+      setSelectedImageIds([]);
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
+  };
+  
+  const toggleImageSelection = (id: string) => {
+    setSelectedImageIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const clearSelection = () => {
+    setSelectedImageIds([]);
+    setSelectionMode(false);
+  };
+
   return (
     <div className="m-4">
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4 w-full">
-        <input
-          type="text"
-          placeholder="Search for an image tag..."
-          onChange={handleSearch}
-          className="w-full sm:grow px-4 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-        />
-        <button
-          className={`whitespace-nowrap min-w-max px-4 py-2 rounded ${
-            images.every((img) => img.status === "processed")
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-cyan-600 text-white hover:bg-cyan-700"
-          }`}
-          onClick={handleProcessAll}
-          disabled={
-            isProcessing || images.every((img) => img.status === "processed")
-          }
-        >
-          {isProcessing ? "Processing..." : "Process All"}
-        </button>
-      </div>
+      <FunctionBar
+            images={filteredImages}
+            handleProcessAll={handleProcessAll}
+            isProcessing={isProcessing}
+            selectionMode={selectionMode}
+            setSelectionMode={setSelectionMode}
+            handleDeleteSelected={handleDeleteSelected}
+            selectedImageIds={selectedImageIds}
+            clearSelection={clearSelection}
+            handleSearch={handleSearch}
+      />
 
       <ImageGrid
         images={filteredImages}
@@ -175,6 +201,9 @@ const ImageUpload = () => {
         onImageClick={handleImageClick}
         handleFileUpload={handleFileUpload}
         uploading={uploading}
+        selectionMode={selectionMode}
+        selectedImageIds={selectedImageIds}
+        toggleImageSelection={toggleImageSelection}
       />
 
       {/* Image Popup */}
