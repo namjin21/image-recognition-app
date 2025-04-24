@@ -1,7 +1,8 @@
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
 const { v4: uuidv4 } = require("uuid");
 
 const s3 = new S3Client({ region: process.env.AWS_REGION });
+const bucketName = process.env.S3_BUCKET_NAME;
 
 const uploadToS3 = async (fileBuffer, originalFileName, mimeType, userId) => {
     const uniqueId = uuidv4();
@@ -11,7 +12,7 @@ const uploadToS3 = async (fileBuffer, originalFileName, mimeType, userId) => {
     console.log("s3key: ", s3Key)
 
     const params = {
-        Bucket: process.env.S3_BUCKET_NAME,
+        Bucket: bucketName,
         Key: s3Key,
         Body: fileBuffer,
         ContentType: mimeType,
@@ -27,4 +28,18 @@ const uploadToS3 = async (fileBuffer, originalFileName, mimeType, userId) => {
     }
 };
 
-module.exports = { uploadToS3 };
+const deleteImagesFromS3 = async (s3Keys) => {
+    try {
+        const params = {
+            Bucket: bucketName,
+            Delete: { Objects: s3Keys.map((key) => ({ Key: key }))},
+        };
+        const command = new DeleteObjectsCommand(params);
+        await s3.send(command);
+    } catch (error) {
+        console.error("Error deleting images from S3:", error);
+        throw error;
+    }
+}
+
+module.exports = { uploadToS3, deleteImagesFromS3 };

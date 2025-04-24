@@ -47,7 +47,7 @@ const storeInitialMetadata = async (
 const setLabels = async (userId, imageId, labels) => {
   const params = {
     TableName: TABLE_NAME,
-    Key: {  userId, imageId },
+    Key: { userId, imageId },
     UpdateExpression: "SET processStatus = :processStatus, labels = :labels",
     ExpressionAttributeValues: {
       ":processStatus": "processed",
@@ -111,15 +111,15 @@ const getAllMetadata = async (userId) => {
         const signedUrl = await generatePreSignedUrl(
           process.env.S3_BUCKET_NAME,
           item.s3Key,
-          urlExpiry,
-        )
+          urlExpiry
+        );
         return {
           id: item.imageId,
           url: signedUrl,
           originalFileName: item.originalFileName,
           labels: item.labels || [],
           status: item.processStatus || "pending",
-        }
+        };
       })
     );
 
@@ -141,7 +141,32 @@ const getS3Key = async (userId, imageId) => {
   } catch (error) {
     console.error("Error getting s3 key:", error);
   }
-}
+};
+
+const deleteImagesMetadata = async (imageIds) => {
+  const deleteRequests = imageIds.map((imageId) => ({
+    DeleteRequest: {
+      Key: { userId: { S: userId }, imageId: { S: imageId } },
+    },
+  }));
+
+  const deleteChunks = [];
+  while (deleteRequests.length > 0) {
+    deleteChunks.push(deleteRequests.splice(0, 25)); // DynamoDB batch write max = 25
+  }
+
+  await Promise.all(
+    deleteChunks.map((chunk) =>
+      dynamoDB.send(
+        new BatchWriteItemCommand({
+          RequestItems: {
+            [TABLE_NAME]: chunk,
+          },
+        })
+      )
+    )
+  );
+};
 
 module.exports = {
   storeInitialMetadata,
@@ -150,4 +175,5 @@ module.exports = {
   getMetadata,
   getAllMetadata,
   getS3Key,
+  deleteImagesMetadata,
 };

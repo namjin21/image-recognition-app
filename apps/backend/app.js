@@ -13,10 +13,12 @@ app.use(express.json());
 const uploadRoute = require("./routes/uploadImageRoute");
 const processRoute = require("./routes/processImageRoute");
 const metadataRoute = require("./routes/metadataRoute");
+const deleteImagesRoute = require("./routes/deleteImagesRoute");
 
 app.use("/upload", authenticateUser, uploadRoute);
 app.use("/process", processRoute);
 app.use("/metadata", metadataRoute);
+app.use("/images", deleteImagesRoute);
 
 const PORT = process.env.PORT || 3001;
 // if (process.env.IS_OFFLINE) {
