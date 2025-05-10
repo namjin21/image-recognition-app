@@ -130,7 +130,7 @@ export const getS3Key = async (userId, imageId) => {
   });
 
   try {
-    result = await dynamoDB.send(command);
+    const result = await dynamoDB.send(command);
     return result.Item.s3Key;
   } catch (error) {
     console.error("Error getting s3 key:", error);
