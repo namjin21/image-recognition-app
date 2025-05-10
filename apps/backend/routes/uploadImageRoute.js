@@ -1,7 +1,7 @@
-const express = require("express");
-const { upload, handleUpload } = require("../controllers/uploadImageController");
+import { Router } from "express";
+import { upload, handleUpload } from "../controllers/uploadImageController.js";
 
-const router = express.Router();
+const router = Router();
 router.post("/", upload.array("images", 10), handleUpload);
 
-module.exports = router;
+export default router;

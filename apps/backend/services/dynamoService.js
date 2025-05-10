@@ -1,12 +1,6 @@
-const { DynamoDBClient, BatchWriteItemCommand } = require("@aws-sdk/client-dynamodb");
-const {
-  DynamoDBDocumentClient,
-  PutCommand,
-  UpdateCommand,
-  GetCommand,
-  QueryCommand,
-} = require("@aws-sdk/lib-dynamodb");
-const { generatePreSignedUrl } = require("../utils/s3Utils");
+import { DynamoDBClient, BatchWriteItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand, UpdateCommand, GetCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { generatePreSignedUrl } from "../utils/s3Utils.js";
 
 // Initialize the DynamoDB client
 const client = new DynamoDBClient({ region: process.env.AWS_REGION });
@@ -15,7 +9,7 @@ const dynamoDB = DynamoDBDocumentClient.from(client);
 const TABLE_NAME = process.env.DYNAMODB_TABLE;
 const urlExpiry = 3600;
 
-const storeInitialMetadata = async (
+export const storeInitialMetadata = async (
   imageId,
   s3Key,
   originalFileName,
@@ -44,7 +38,7 @@ const storeInitialMetadata = async (
   }
 };
 
-const setLabels = async (userId, imageId, labels) => {
+export const setLabels = async (userId, imageId, labels) => {
   const params = {
     TableName: TABLE_NAME,
     Key: { userId, imageId },
@@ -64,7 +58,7 @@ const setLabels = async (userId, imageId, labels) => {
   }
 };
 
-const updateStatus = async (imageId, processStatus) => {
+export const updateStatus = async (imageId, processStatus) => {
   const params = {
     TableName: TABLE_NAME,
     Key: { imageId },
@@ -83,7 +77,7 @@ const updateStatus = async (imageId, processStatus) => {
   }
 };
 
-const getMetadata = async (userId, imageId) => {
+export const getMetadata = async (userId, imageId) => {
   const command = new GetCommand({
     TableName: TABLE_NAME,
     Key: { userId, imageId },
@@ -93,7 +87,7 @@ const getMetadata = async (userId, imageId) => {
   return result.Item;
 };
 
-const getAllMetadata = async (userId) => {
+export const getAllMetadata = async (userId) => {
   const params = {
     TableName: TABLE_NAME,
     KeyConditionExpression: "userId = :userId",
@@ -129,7 +123,7 @@ const getAllMetadata = async (userId) => {
   }
 };
 
-const getS3Key = async (userId, imageId) => {
+export const getS3Key = async (userId, imageId) => {
   const command = new GetCommand({
     TableName: TABLE_NAME,
     Key: { userId, imageId },
@@ -143,7 +137,7 @@ const getS3Key = async (userId, imageId) => {
   }
 };
 
-const deleteImagesMetadata = async (imageIds, userId) => {
+export const deleteImagesMetadata = async (imageIds, userId) => {
   const deleteRequests = imageIds.map((imageId) => ({
     DeleteRequest: {
       Key: { userId: { S: userId }, imageId: { S: imageId } },
@@ -166,14 +160,4 @@ const deleteImagesMetadata = async (imageIds, userId) => {
       )
     )
   );
-};
-
-module.exports = {
-  storeInitialMetadata,
-  setLabels,
-  updateStatus,
-  getMetadata,
-  getAllMetadata,
-  getS3Key,
-  deleteImagesMetadata,
 };

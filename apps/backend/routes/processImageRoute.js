@@ -1,7 +1,7 @@
-const express = require("express");
-const { processImage } = require("../controllers/processImageController");
+import express from "express";
+import { processImage } from "../controllers/processImageController.js";
 
 const router = express.Router();
 router.post("/", processImage);
 
-module.exports = router;
+export default router;

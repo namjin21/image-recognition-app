@@ -1,7 +1,7 @@
-const { deleteImagesMetadata, getS3Key } = require("../services/dynamoService");
-const { deleteImagesFromS3 } = require("../services/s3Service");
+import { deleteImagesMetadata, getS3Key } from "../services/dynamoService.js";
+import { deleteImagesFromS3 } from "../services/s3Service.js";
 
-const deleteImages = async (req, res) => {
+export const deleteImages = async (req, res) => {
   try {
     const { userId } = req.params;
     const { imageIds } = req.body;
@@ -26,5 +26,3 @@ const deleteImages = async (req, res) => {
     res.status(500).json({ error: "Failed to delete images" });
   }
 };
-
-module.exports = { deleteImages };

@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 
 export const verifier = CognitoJwtVerifier.create({

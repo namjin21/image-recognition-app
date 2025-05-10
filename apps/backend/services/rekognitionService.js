@@ -1,13 +1,10 @@
-const {
-  RekognitionClient,
-  DetectLabelsCommand,
-} = require("@aws-sdk/client-rekognition");
-const { getS3Key } = require("./dynamoService");
+import { RekognitionClient, DetectLabelsCommand } from "@aws-sdk/client-rekognition";
+import { getS3Key } from "./dynamoService.js";
 
 // Initialize the Rekognition client
 const rekognition = new RekognitionClient({ region: process.env.AWS_REGION });
 
-const analyzeImage = async (userId, imageId) => {
+export const analyzeImage = async (userId, imageId) => {
   try {
     const s3Key = await getS3Key(userId, imageId);
   
@@ -38,5 +35,3 @@ const analyzeImage = async (userId, imageId) => {
 const processRekognitionResult = (res) => {
   return res.Labels.map((label) => label.Name);
 };
-
-module.exports = { analyzeImage };

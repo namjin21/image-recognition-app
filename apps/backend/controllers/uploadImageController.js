@@ -1,12 +1,12 @@
-const multer = require("multer");
-const { uploadToS3 } = require("../services/s3Service");
-const { storeInitialMetadata } = require("../services/dynamoService");
-const { generatePreSignedUrl } = require("../utils/s3Utils");
+import multer from "multer";
+import { uploadToS3 } from "../services/s3Service.js";
+import { storeInitialMetadata } from "../services/dynamoService.js";
+import { generatePreSignedUrl } from "../utils/s3Utils.js";
 
 // Set up Multer for file handling
-const upload = multer({ storage: multer.memoryStorage() });
+export const upload = multer({ storage: multer.memoryStorage() });
 
-const handleUpload = async (req, res) => {
+export const handleUpload = async (req, res) => {
     console.log(req.user.id);
     try {
         if (!req.files || req.files.length === 0) {
@@ -42,5 +42,3 @@ const handleUpload = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-module.exports = { upload, handleUpload };

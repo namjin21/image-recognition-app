@@ -1,7 +1,7 @@
-const { analyzeImage } = require("../services/rekognitionService");
-const { setLabels, updateStatus } = require("../services/dynamoService");
+import { analyzeImage } from "../services/rekognitionService.js";
+import { setLabels, updateStatus } from "../services/dynamoService.js";
 
-const processImage = async (req, res) => {
+export const processImage = async (req, res) => {
     const { userId, imageId } = req.body;
     if (!imageId) {
         return res.status(400).json({ error: "Missing partition key: imageId" });
@@ -17,5 +17,3 @@ const processImage = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-module.exports = { processImage };

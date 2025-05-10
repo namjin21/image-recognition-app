@@ -1,8 +1,8 @@
-const express = require("express");
-const { fetchMetadata, fetchAllMetadata } = require("../controllers/metadataController");
+import express from "express";
+import { fetchMetadata, fetchAllMetadata } from "../controllers/metadataController.js";
 
 const router = express.Router();
 router.get("/:imageId", fetchMetadata);
 router.get("/all/:userId", fetchAllMetadata);
 
-module.exports = router;
+export default router;

@@ -1,6 +1,6 @@
-const { getMetadata, getAllMetadata } = require("../services/dynamoService");
+import { getMetadata, getAllMetadata }  from "../services/dynamoService.js";
 
-const fetchMetadata = async (req, res) => {
+export const fetchMetadata = async (req, res) => {
     try {
         const { userId, imageId } = req.params;
         if (!userId) return res.status(400).json({ error: "Missing userId" });
@@ -14,7 +14,7 @@ const fetchMetadata = async (req, res) => {
     }
 };
 
-const fetchAllMetadata = async (req, res) => {
+export const fetchAllMetadata = async (req, res) => {
     try {
         const { userId } = req.params;
         if (!userId) return res.status(400).json({ error: "Missing userId" });
@@ -25,5 +25,3 @@ const fetchAllMetadata = async (req, res) => {
         res.status(500).json({ error: 'Could not retrieve images for user' });
     }
 };
-
-module.exports = { fetchMetadata, fetchAllMetadata };
