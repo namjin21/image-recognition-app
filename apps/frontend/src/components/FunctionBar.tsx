@@ -36,7 +36,10 @@ const FunctionBar: React.FC<FunctionBarProps> = ({
         </button>
         <span className="text-black">{selectedImageIds.length} selected</span>
         <button
-          onClick={handleDeleteSelected}
+          onClick={() => {
+            // TODO: add confirmation popup
+            handleDeleteSelected();
+          }}
           disabled={selectedImageIds.length === 0}
           className="text-gray-600 px-2 py-2 rounded-full cursor-pointer hover:bg-gray-200 disabled:cursor-not-allowed"
         >
@@ -47,12 +50,24 @@ const FunctionBar: React.FC<FunctionBarProps> = ({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4 w-full">
+    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4 w-full">
       <button
-        className={`whitespace-nowrap min-w-max px-4 py-2 rounded ${
+        className={`whitespace-nowrap min-w-max px-4 py-2 rounded-full ${
+          images.length === 0
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            : "bg-cyan-600 text-white hover:bg-cyan-700 cursor-pointer"
+        }`}
+        onClick={() => setSelectionMode(true)}
+        disabled={images.length === 0}
+      >
+        Select Images
+      </button>
+
+      <button
+        className={`whitespace-nowrap min-w-max px-4 py-2 rounded-full ${
           images.every((img) => img.status === "processed")
             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-cyan-600 text-white hover:bg-cyan-700"
+            : "bg-cyan-600 text-white hover:bg-cyan-700 cursor-pointer"
         }`}
         onClick={handleProcessAll}
         disabled={
@@ -62,18 +77,11 @@ const FunctionBar: React.FC<FunctionBarProps> = ({
         {isProcessing ? "Processing..." : "Process All"}
       </button>
 
-      <button
-        className={`whitespace-nowrap min-w-max px-4 py-2 rounded bg-cyan-600 text-white hover:bg-cyan-700 cursor-pointer`}
-        onClick={() => setSelectionMode(true)}
-      >
-        Select Images
-      </button>
-
       <input
         type="text"
         placeholder="Search for an image tag..."
         onChange={handleSearch}
-        className="w-full sm:grow px-4 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="w-full sm:grow px-4 py-2 text-black border border-gray-300 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
     </div>
   );

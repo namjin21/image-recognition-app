@@ -111,7 +111,7 @@ const ImageUpload = () => {
         userId,
         imageId,
       });
-      console.log(res.data.labels);
+      
       setImages((prevImages) =>
         prevImages.map((img) =>
           img.id === imageId
