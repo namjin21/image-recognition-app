@@ -32,7 +32,11 @@ const ImageUpload = () => {
     console.log(userId);
     const fetchImages = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/metadata/all/${userId}`);
+        const res = await axios.get(`${API_BASE_URL}/api/images`, {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
         console.log(res.data);
         setImages((prevImages) => [...prevImages, ...res.data]);
       } catch (error) {
@@ -59,7 +63,7 @@ const ImageUpload = () => {
       const formData = new FormData();
       fileArray.forEach((file) => formData.append("images", file));
 
-      const response = await axios.post(`${API_BASE_URL}/upload`, formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/images/upload`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${idToken}`,
@@ -107,10 +111,13 @@ const ImageUpload = () => {
   // Process a single image
   const handleProcessImage = async (imageId: string) => {
     try {
-      const res = await axios.post(`${API_BASE_URL}/process`, {
-        userId,
-        imageId,
-      });
+      const res = await axios.post(`${API_BASE_URL}/api/images/${imageId}/analyze`, 
+        {}, // body is empty for now
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
       
       setImages((prevImages) =>
         prevImages.map((img) =>
@@ -152,7 +159,7 @@ const ImageUpload = () => {
     if (!userId || selectedImageIds.length === 0) return;
 
     try {
-      await axios.delete(`${API_BASE_URL}/images/${userId}`, {
+      await axios.delete(`${API_BASE_URL}/api/images`, {
         data: { imageIds: selectedImageIds },
         headers: {
           Authorization: `Bearer ${idToken}`,

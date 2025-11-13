@@ -4,7 +4,7 @@ import { getS3Key } from "./dynamoService.js";
 // Initialize the Rekognition client
 const rekognition = new RekognitionClient({ region: process.env.AWS_REGION });
 
-export const analyzeImage = async (userId, imageId) => {
+export const generateImageLabels = async (userId, imageId) => {
   try {
     const s3Key = await getS3Key(userId, imageId);
   

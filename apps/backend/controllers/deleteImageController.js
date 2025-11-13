@@ -3,7 +3,7 @@ import { deleteImagesFromS3 } from "../services/s3Service.js";
 
 export const deleteImages = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user.id;
     const { imageIds } = req.body;
 
     if (!userId || !Array.isArray(imageIds) || imageIds.length === 0) {

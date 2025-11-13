@@ -2,7 +2,9 @@ import { getMetadata, getAllMetadata }  from "../services/dynamoService.js";
 
 export const fetchMetadata = async (req, res) => {
     try {
-        const { userId, imageId } = req.params;
+        console.log(req)
+        const userId = req.user.id;
+        const { imageId } = req.params;
         if (!userId) return res.status(400).json({ error: "Missing userId" });
         if (!imageId) return res.status(400).json({ error: "Missing imageId" });
 
@@ -16,7 +18,7 @@ export const fetchMetadata = async (req, res) => {
 
 export const fetchAllMetadata = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const userId = req.user.id;
         if (!userId) return res.status(400).json({ error: "Missing userId" });
     
         const allMetadata = await getAllMetadata(userId);
