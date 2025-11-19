@@ -4,8 +4,6 @@ import { FaRegTrashCan } from "react-icons/fa6";
 
 interface FunctionBarProps {
   images: ImageData[];
-  handleProcessAll: () => void;
-  isProcessing: boolean;
   selectionMode: boolean;
   setSelectionMode: (value: boolean) => void;
   handleDeleteSelected: () => void;
@@ -16,8 +14,6 @@ interface FunctionBarProps {
 
 const FunctionBar: React.FC<FunctionBarProps> = ({
   images,
-  handleProcessAll,
-  isProcessing,
   selectionMode,
   setSelectionMode,
   handleDeleteSelected,
@@ -61,20 +57,6 @@ const FunctionBar: React.FC<FunctionBarProps> = ({
         disabled={images.length === 0}
       >
         Select Images
-      </button>
-
-      <button
-        className={`whitespace-nowrap min-w-max px-4 py-2 rounded-full ${
-          images.every((img) => img.status === "processed")
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-cyan-600 text-white hover:bg-cyan-700 cursor-pointer"
-        }`}
-        onClick={handleProcessAll}
-        disabled={
-          isProcessing || images.every((img) => img.status === "processed")
-        }
-      >
-        {isProcessing ? "Processing..." : "Process All"}
       </button>
 
       <input

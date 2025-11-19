@@ -68,14 +68,14 @@ const ImageGrid: React.FC<ImageGridProps> = ({
               className="absolute top-2 left-2 w-5 h-5"
             />
           )}
-          {image.status === "pending" && (
+          {/* {(image.status === "pending" || image.status === "processing") && ( */}
             <button
-              className="absolute inset-0 m-auto w-30 h-10 bg-cyan-500 text-white font-bold rounded-full shadow-lg hover:bg-cyan-600 flex items-center justify-center cursor-pointer"
+              className="absolute inset-0 m-auto w-35 h-20 bg-transparent text-white font-bold rounded-full shadow-lg flex items-center justify-center cursor-pointer"
               onClick={() => onProcessImage(image.id)}
             >
-              {false ? "Processing..." : "Process"}
+              {image.status !== "processing" ? "추억 생성 중..." : "추억 생성하기"}
             </button>
-          )}
+          {/* )} */}
         </div>
       ))}
     </div>

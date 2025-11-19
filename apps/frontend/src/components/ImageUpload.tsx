@@ -13,7 +13,9 @@ export interface ImageData {
   url: string;
   originalFileName: string;
   labels?: string[];
-  status: "pending" | "processed";
+  story?: string;
+  category?: string;
+  status: "pending" | "processing" | "processed";
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -22,7 +24,6 @@ const ImageUpload = () => {
   const { userId, loading, idToken } = useUser();
   const [images, setImages] = useState<ImageData[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
   const [searchWord, setSearchWord] = useState("");
   const [selectionMode, setSelectionMode] = useState(false);
@@ -81,6 +82,7 @@ const ImageUpload = () => {
       console.log(uploadedImages);
 
       setImages((prevImages) => [...prevImages, ...uploadedImages]);
+      handleProcessAll(uploadedImages);
     } catch (error) {
       console.error("Upload failed:", error);
     } finally {
@@ -88,29 +90,32 @@ const ImageUpload = () => {
     }
   };
 
-  // Process all unprocessed images
-  const handleProcessAll = async () => {
-    const unprocessedImages = images.filter(
-      (image) => image.status === "pending"
-    );
-    if (unprocessedImages.length === 0) return alert("No unprocessed images");
-
-    setIsProcessing(true);
-
+  // Process all newly uploaded images
+  const handleProcessAll = async (uploadedImages: ImageData[]) => {
     try {
       await Promise.all(
-        unprocessedImages.map(async (image) => {
+        uploadedImages.map(async (image) => {
           await handleProcessImage(image.id);
         })
       );
-    } finally {
-      setIsProcessing(false);
+    } catch (error) {
+      console.log("Processing all images failed", error)
     }
   };
 
   // Process a single image
   const handleProcessImage = async (imageId: string) => {
     try {
+      setImages((prevImages) =>
+        prevImages.map((img) =>
+          img.id === imageId
+            ? { ...img,
+                status: "processing",
+              }
+            : img
+        )
+      );
+
       const res = await axios.post(`${API_BASE_URL}/api/images/${imageId}/analyze`, 
         {}, // body is empty for now
         {
@@ -196,8 +201,6 @@ const ImageUpload = () => {
     <div className="m-4">
       <FunctionBar
             images={filteredImages}
-            handleProcessAll={handleProcessAll}
-            isProcessing={isProcessing}
             selectionMode={selectionMode}
             setSelectionMode={setSelectionMode}
             handleDeleteSelected={handleDeleteSelected}
