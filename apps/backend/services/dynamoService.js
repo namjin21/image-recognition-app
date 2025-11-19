@@ -38,14 +38,17 @@ export const storeInitialMetadata = async (
   }
 };
 
-export const setLabels = async (userId, imageId, labels) => {
+export const setAnalysis = async (userId, imageId, labels, category, mood, story) => {
   const params = {
     TableName: TABLE_NAME,
     Key: { userId, imageId },
-    UpdateExpression: "SET processStatus = :processStatus, labels = :labels",
+    UpdateExpression: "SET processStatus = :processStatus, labels = :labels, category = :category, mood = :mood, story = :story",
     ExpressionAttributeValues: {
       ":processStatus": "processed",
       ":labels": labels,
+      ":category": category,
+      ":mood": mood,
+      ":story": story,
     },
   };
 
@@ -112,6 +115,9 @@ export const getAllMetadata = async (userId) => {
           url: signedUrl,
           originalFileName: item.originalFileName,
           labels: item.labels || [],
+          category: item.category,
+          mood: item.mood,
+          story: item.story,
           status: item.processStatus || "pending",
         };
       })

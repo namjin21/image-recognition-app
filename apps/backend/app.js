@@ -26,18 +26,6 @@ imagesRouter.use(analyzeImageRoute);  // POST /api/images/:id/analyze
 // 전체 이미지 리소스 그룹 보호
 app.use("/api/images", authenticateUser, imagesRouter);
 
-// import uploadRoute from "./routes/uploadImageRoute.js";
-// import processRoute from "./routes/processImageRoute.js";
-// import metadataRoute from "./routes/metadataRoute.js";
-// import deleteImagesRoute from "./routes/deleteImagesRoute.js";
-// import llmRoute from "./routes/llmRoute.js";
-
-// app.use("/upload", authenticateUser, uploadRoute);
-// app.use("/process", processRoute);
-// app.use("/metadata", metadataRoute);
-// app.use("/images", deleteImagesRoute);
-// app.use("/llm", llmRoute);
-
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 export const handler = serverless(app);

@@ -122,7 +122,11 @@ const ImageUpload = () => {
       setImages((prevImages) =>
         prevImages.map((img) =>
           img.id === imageId
-            ? { ...img, status: "processed", labels: res.data.labels }
+            ? { ...img,
+                status: "processed",
+                labels: res.data.labels,
+                category: res.data.category,
+                story: res.data.story }
             : img
         )
       );

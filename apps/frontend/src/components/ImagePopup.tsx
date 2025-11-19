@@ -24,6 +24,13 @@ const ImagePopup: React.FC<ImagePopupProps> = ({ image, onClose }) => {
           className="w-full h-auto rounded-lg my-4"
         />
         <div>
+          {image.story?.length ? (
+            <span className="text-black text-sm">{image.story}</span>
+          ) : (
+            <span className="text-black">No story available</span>
+          )}
+        </div>
+        {/* <div>
           {image.labels?.length ? (
             image.labels.map((label, index) => (
               <span className="bg-blue-500 text-white text-xs font-semibold mx-0.5 my-0.5 px-2 py-1 rounded inline-block whitespace-nowrap" key={index}>{label}</span>
@@ -31,7 +38,7 @@ const ImagePopup: React.FC<ImagePopupProps> = ({ image, onClose }) => {
           ) : (
             <p className="text-black">No labels available</p>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

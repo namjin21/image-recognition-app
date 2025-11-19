@@ -1,5 +1,5 @@
 import { generateImageLabels } from "../services/rekognitionService.js";
-import { setLabels, updateStatus } from "../services/dynamoService.js";
+import { setAnalysis, updateStatus } from "../services/dynamoService.js";
 import { generateStory } from "../services/llmService.js";
 
 export const analyzeImage = async (req, res) => {
@@ -12,10 +12,10 @@ export const analyzeImage = async (req, res) => {
 
     try {
         const labels = await generateImageLabels(userId, imageId);
-        await setLabels(userId, imageId, labels);
-        const story = await generateStory(labels);
+        const {category, mood, story} = await generateStory(labels);
+        await setAnalysis(userId, imageId, labels, category, mood, story);
 
-        res.json({ message: "Image processed", imageId, labels, story });
+        res.json({ message: "Image processed", imageId, labels, category, mood, story });
     } catch (error) {
         console.error("Error analyzing image:", error);
         await updateStatus(imageId, "failed");
