@@ -11,13 +11,15 @@ const urlExpiry = 3600;
 
 export const storeInitialMetadata = async (
   imageId,
-  s3Key,
+  originalS3Key,
+  optimizedS3Key,
   originalFileName,
   userId
 ) => {
   const metadata = {
     imageId,
-    s3Key,
+    originalS3Key,
+    optimizedS3Key,
     originalFileName,
     labels: [],
     processStatus: "pending",
@@ -38,17 +40,18 @@ export const storeInitialMetadata = async (
   }
 };
 
-export const setAnalysis = async (userId, imageId, labels, category, mood, story) => {
+export const setAnalysis = async (userId, imageId, labels, category, mood, story, optimizedS3Key) => {
   const params = {
     TableName: TABLE_NAME,
     Key: { userId, imageId },
-    UpdateExpression: "SET processStatus = :processStatus, labels = :labels, category = :category, mood = :mood, story = :story",
+    UpdateExpression: "SET processStatus = :processStatus, labels = :labels, category = :category, mood = :mood, story = :story, optimizedS3Key = :optimizedS3Key",
     ExpressionAttributeValues: {
       ":processStatus": "processed",
       ":labels": labels,
       ":category": category,
       ":mood": mood,
       ":story": story,
+      ":optimizedS3Key": optimizedS3Key,
     },
   };
 
@@ -107,7 +110,7 @@ export const getAllMetadata = async (userId) => {
       metadata.map(async (item) => {
         const signedUrl = await generatePreSignedUrl(
           process.env.S3_BUCKET_NAME,
-          item.s3Key,
+          item.optimizedS3Key,
           urlExpiry
         );
         return {
@@ -129,7 +132,7 @@ export const getAllMetadata = async (userId) => {
   }
 };
 
-export const getS3Key = async (userId, imageId) => {
+export const getOriginalS3Key = async (userId, imageId) => {
   const command = new GetCommand({
     TableName: TABLE_NAME,
     Key: { userId, imageId },
@@ -137,9 +140,23 @@ export const getS3Key = async (userId, imageId) => {
 
   try {
     const result = await dynamoDB.send(command);
-    return result.Item.s3Key;
+    return result.Item.originalS3Key;
   } catch (error) {
-    console.error("Error getting s3 key:", error);
+    console.error("Error getting original s3 key:", error);
+  }
+};
+
+export const getOptimizedS3Key = async (userId, imageId) => {
+  const command = new GetCommand({
+    TableName: TABLE_NAME,
+    Key: { userId, imageId },
+  });
+
+  try {
+    const result = await dynamoDB.send(command);
+    return result.Item.optimizedS3Key;
+  } catch (error) {
+    console.error("Error getting optimized s3 key:", error);
   }
 };
 

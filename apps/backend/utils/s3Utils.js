@@ -15,3 +15,9 @@ export async function generatePreSignedUrl(bucketName, objectKey, expiresInSecon
 
   return signedUrl;
 }
+
+export function convertToOptimizedS3Key(originalS3Key) {
+  return originalS3Key
+    .replace('/original/', '/optimized/')
+    .replace(/\.[^.]+$/, ".webp");
+}

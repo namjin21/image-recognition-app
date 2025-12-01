@@ -44,7 +44,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
           >
             <img
               className={`w-full h-auto object-cover rounded-xl shadow hover:bg-linear-270 from-white to-zinc-900 ${
-                image.status === "pending" ? "opacity-50" : "cursor-pointer"
+                image.status === "processing"|| image.status === "uploading" ? "opacity-50" : "cursor-pointer"
               } ${
                 selectionMode &&
                 selectedImageIds.includes(image.id) &&
@@ -68,14 +68,14 @@ const ImageGrid: React.FC<ImageGridProps> = ({
               className="absolute top-2 left-2 w-5 h-5"
             />
           )}
-          {/* {(image.status === "pending" || image.status === "processing") && ( */}
+          {(image.status === "uploading" || image.status === "processing") && (
             <button
-              className="absolute inset-0 m-auto w-35 h-20 bg-transparent text-white font-bold rounded-full shadow-lg flex items-center justify-center cursor-pointer"
+              className="absolute inset-0 m-auto w-35 h-15 bg-gray-200/40 text-gray-800 rounded-3xl shadow-lg flex items-center justify-center cursor-pointer"
               onClick={() => onProcessImage(image.id)}
             >
-              {image.status !== "processing" ? "추억 생성 중..." : "추억 생성하기"}
+              {image.status === "processing" ? "추억 생성 중..." : "업로드 중..."}
             </button>
-          {/* )} */}
+          )}
         </div>
       ))}
     </div>

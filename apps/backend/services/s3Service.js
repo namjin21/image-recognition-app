@@ -7,13 +7,13 @@ const bucketName = process.env.S3_BUCKET_NAME;
 export const uploadToS3 = async (fileBuffer, originalFileName, mimeType, userId) => {
     const uniqueId = uuidv4();
     const fileExtension = originalFileName.split(".").pop();
-    const s3Key = `${userId}/${uniqueId}.${fileExtension}`
+    const originalS3Key = `${userId}/original/${uniqueId}.${fileExtension}`
 
-    console.log("s3key: ", s3Key)
+    console.log("s3key: ", originalS3Key)
 
     const params = {
         Bucket: bucketName,
-        Key: s3Key,
+        Key: originalS3Key,
         Body: fileBuffer,
         ContentType: mimeType,
     };
@@ -21,7 +21,7 @@ export const uploadToS3 = async (fileBuffer, originalFileName, mimeType, userId)
     try {
         const command = new PutObjectCommand(params);
         await s3.send(command);
-        return { uniqueId, s3Key };
+        return { uniqueId, originalS3Key };
     } catch (error) {
         console.error("Error uploading to S3:", error);
         throw error;

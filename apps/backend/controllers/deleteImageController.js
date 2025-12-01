@@ -1,4 +1,4 @@
-import { deleteImagesMetadata, getS3Key } from "../services/dynamoService.js";
+import { deleteImagesMetadata, getOptimizedS3Key, getOriginalS3Key } from "../services/dynamoService.js";
 import { deleteImagesFromS3 } from "../services/s3Service.js";
 
 export const deleteImages = async (req, res) => {
@@ -9,15 +9,18 @@ export const deleteImages = async (req, res) => {
     if (!userId || !Array.isArray(imageIds) || imageIds.length === 0) {
       return res.status(400).json({ error: "Missing userId or imageIds" });
     }
+    
+    const allS3Keys = [];
 
-    const s3Keys = await Promise.all(
-      imageIds.map(async (imageId) => {
-        const s3Key = await getS3Key(userId, imageId);
-        return s3Key;
-      })
-    );
+    for (const imageId of imageIds) {
+      const originalKey = await getOriginalS3Key(userId, imageId);
+      const optimizedKey = await getOptimizedS3Key(userId, imageId);
 
-    await deleteImagesFromS3(s3Keys);
+      if (originalKey) allS3Keys.push(originalKey);
+      if (optimizedKey) allS3Keys.push(optimizedKey);
+    }
+
+    await deleteImagesFromS3(allS3Keys);
     await deleteImagesMetadata(imageIds, userId);
 
     return res.json({ message: `Images deleted successfully for user ${userId}` });

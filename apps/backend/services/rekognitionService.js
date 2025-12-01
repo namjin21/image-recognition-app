@@ -1,12 +1,12 @@
 import { RekognitionClient, DetectLabelsCommand } from "@aws-sdk/client-rekognition";
-import { getS3Key } from "./dynamoService.js";
+import { getOriginalS3Key } from "./dynamoService.js";
 
 // Initialize the Rekognition client
 const rekognition = new RekognitionClient({ region: process.env.AWS_REGION });
 
 export const generateImageLabels = async (userId, imageId) => {
   try {
-    const s3Key = await getS3Key(userId, imageId);
+    const s3Key = await getOriginalS3Key(userId, imageId);
   
     const params = {
       Image: {

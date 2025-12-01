@@ -1,7 +1,7 @@
 import multer from "multer";
 import { uploadToS3 } from "../services/s3Service.js";
 import { storeInitialMetadata } from "../services/dynamoService.js";
-import { generatePreSignedUrl } from "../utils/s3Utils.js";
+import { convertToOptimizedS3Key, generatePreSignedUrl } from "../utils/s3Utils.js";
 
 // Set up Multer for file handling
 export const upload = multer({ storage: multer.memoryStorage() });
@@ -21,13 +21,13 @@ export const handleUpload = async (req, res) => {
         const uploadResults = await Promise.all(
             req.files.map(async (file) => {
                 const { originalname, buffer, mimetype } = file;
-                const { uniqueId, s3Key } = await uploadToS3(buffer, originalname, mimetype, userId);
-                await storeInitialMetadata(uniqueId, s3Key, originalname, userId);
+                const { uniqueId, originalS3Key } = await uploadToS3(buffer, originalname, mimetype, userId);
+                const optimizedS3Key = convertToOptimizedS3Key(originalS3Key);
+                await storeInitialMetadata(uniqueId, originalS3Key, optimizedS3Key, originalname, userId);
 
-                const presignedUrl = await generatePreSignedUrl(process.env.S3_BUCKET_NAME, s3Key, 3600);
+                const presignedUrl = await generatePreSignedUrl(process.env.S3_BUCKET_NAME, optimizedS3Key, 3600);
                 return {
                     imageId: uniqueId,
-                    s3Key,
                     originalFileName: originalname,
                     presignedUrl,
                 }

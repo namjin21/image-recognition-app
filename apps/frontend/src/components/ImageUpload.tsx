@@ -9,16 +9,18 @@ import ImageGrid from "./ImageGrid";
 import ImagePopup from "./ImagePopup";
 
 export interface ImageData {
-  id: string;
+  id: string;       // 프론트 렌더링용 (불변값)
+  imageId?: string; // 서버에서 할당되는 실제 imageId
   url: string;
-  originalFileName: string;
+  originalFileName?: string;
   labels?: string[];
   story?: string;
   category?: string;
-  status: "pending" | "processing" | "processed";
+  status?: "uploading" | "pending" | "processing" | "processed" | "failed";
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const MAX_PARALLEL_UPLOADS = 3;
 
 const ImageUpload = () => {
   const { userId, loading, idToken } = useUser();
@@ -59,35 +61,103 @@ const ImageUpload = () => {
 
     setUploading(true);
     const fileArray = Array.from(files);
+    let tempUrl = "";
 
-    try {
-      const formData = new FormData();
-      fileArray.forEach((file) => formData.append("images", file));
+    // 임시 썸네일 우선 추가
+    const tempImages: ImageData[] = fileArray.map((file) => {
+      const tempId = crypto.randomUUID();
+      tempUrl = URL.createObjectURL(file);
+      return {
+        id: tempId,
+        originalFileName: file.name,
+        url: tempUrl, // 브라우저에서 즉시 렌더
+        status: "uploading" as const,
+      };
+    });
+    setImages((prev) => [...prev, ...tempImages]);
 
-      const response = await axios.post(`${API_BASE_URL}/api/images/upload`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${idToken}`,
-        },
-      });
+    // 업로드 함수
+    const uploadSingleFile = async (file: File, tempId: string) => {
+      try {
+        const formData = new FormData();
+        formData.append("images", file);
 
-      const uploadedImages: ImageData[] = response.data.images.map(
-        (image: any) => ({
-          id: image.imageId,
-          originalFileName: image.originalFileName,
-          url: image.presignedUrl,
-          status: "pending",
-        })
+        const response = await axios.post(`${API_BASE_URL}/api/images/upload`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
+
+        const uploaded = response.data.images[0]; // [ { imageId, presignedUrl } ]
+        console.log(uploaded);
+        // 3) 업로드 성공 → URL 업데이트 (이미지 안 깨짐)
+        setImages((prev) =>
+          prev.map((img) =>
+            img.id === tempId
+              ? {
+                  ...img,
+                  id: uploaded.imageId,
+                  status: "pending",
+                }
+              : img
+          )
+        );
+
+        await handleProcessImage(uploaded.imageId);
+        
+
+        // 처리 완료
+        // setImages((prev) =>
+        //   prev.map((img) => (img.id === uploaded.imageId ? { ...img, status: "processed" } : img))
+        // );
+      } catch (err) {
+        console.error("Upload failed:", err);
+        setImages((prev) =>
+          prev.map((img) => (img.id === tempId ? { ...img, status: "failed" } : img))
+        );
+      }
+    };
+
+    // 병렬 업로드 제한
+    for (let i = 0; i < fileArray.length; i += MAX_PARALLEL_UPLOADS) {
+      const chunk = fileArray.slice(i, i + MAX_PARALLEL_UPLOADS);
+      await Promise.all(
+        chunk.map((file, idx) =>
+          uploadSingleFile(file, tempImages[i + idx].id)
+        )
       );
-      console.log(uploadedImages);
-
-      setImages((prevImages) => [...prevImages, ...uploadedImages]);
-      handleProcessAll(uploadedImages);
-    } catch (error) {
-      console.error("Upload failed:", error);
-    } finally {
-      setUploading(false);
     }
+
+    setUploading(false);
+    // try {
+    //   const formData = new FormData();
+    //   fileArray.forEach((file) => formData.append("images", file));
+
+    //   const response = await axios.post(`${API_BASE_URL}/api/images/upload`, formData, {
+    //     headers: {
+    //       "Content-Type": "multipart/form-data",
+    //       Authorization: `Bearer ${idToken}`,
+    //     },
+    //   });
+
+    //   const uploadedImages: ImageData[] = response.data.images.map(
+    //     (image: any) => ({
+    //       id: image.imageId,
+    //       originalFileName: image.originalFileName,
+    //       url: image.presignedUrl,
+    //       status: "pending",
+    //     })
+    //   );
+    //   console.log(uploadedImages);
+
+    //   setImages((prevImages) => [...prevImages, ...uploadedImages]);
+    //   handleProcessAll(uploadedImages);
+    // } catch (error) {
+    //   console.error("Upload failed:", error);
+    // } finally {
+    //   setUploading(false);
+    // }
   };
 
   // Process all newly uploaded images
@@ -123,6 +193,13 @@ const ImageUpload = () => {
             Authorization: `Bearer ${idToken}`,
           },
         });
+
+      // return {
+      //   labels: res.data.labels,
+      //   category: res.data.category,
+      //   story: res.data.story,
+      //   optimizedPresignedUrl: res.data.optimizedPresignedUrl ?? null,
+      // };
       
       setImages((prevImages) =>
         prevImages.map((img) =>
@@ -131,7 +208,9 @@ const ImageUpload = () => {
                 status: "processed",
                 labels: res.data.labels,
                 category: res.data.category,
-                story: res.data.story }
+                story: res.data.story,
+                url: res.data.optimizedPresignedUrl ?? img.url,
+              }
             : img
         )
       );
