@@ -16,11 +16,11 @@ export interface ImageData {
   labels?: string[];
   story?: string;
   category?: string;
-  status?: "uploading" | "pending" | "processing" | "processed" | "failed";
+  status?: "uploading" | "pending" | "processing" | "processed" | "deleting" | "failed";
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const MAX_PARALLEL_UPLOADS = 3;
+const MAX_PARALLEL_UPLOADS = 100;
 
 const ImageUpload = () => {
   const { userId, loading, idToken } = useUser();
@@ -50,7 +50,7 @@ const ImageUpload = () => {
     if (!loading && userId) {
       fetchImages();
     }
-  }, [loading, userId]);
+  }, [idToken, loading, userId]);
 
   // Handle file selection & auto-upload
   const handleFileUpload = async (files: FileList | null) => {
@@ -58,6 +58,7 @@ const ImageUpload = () => {
       console.log("No files to upload");
       return;
     }
+    const start = performance.now();
 
     setUploading(true);
     const fileArray = Array.from(files);
@@ -104,7 +105,7 @@ const ImageUpload = () => {
           )
         );
 
-        await handleProcessImage(uploaded.imageId);
+        // await handleProcessImage(uploaded.imageId);
         
 
         // 처리 완료
@@ -129,35 +130,28 @@ const ImageUpload = () => {
       );
     }
 
+    // const formData = new FormData();
+    // fileArray.forEach((file) => formData.append("images", file));
+    // const response = await axios.post(`${API_BASE_URL}/api/images/upload`, formData, {
+    //   headers: {
+    //     "Content-Type": "multipart/form-data",
+    //     Authorization: `Bearer ${idToken}`,
+    //   },
+    // });
+
+    // const uploadedImages: ImageData[] = response.data.images.map(
+    //   (image: any) => ({
+    //     id: image.imageId,
+    //     originalFileName: image.originalFileName,
+    //     status: "pending",
+    //   })
+    // );
+
+    // setImages((prevImages) => [...prevImages, ...uploadedImages]);
+    const end = performance.now();
+    console.log("여러 api call upload duration:", end - start, "ms");
+
     setUploading(false);
-    // try {
-    //   const formData = new FormData();
-    //   fileArray.forEach((file) => formData.append("images", file));
-
-    //   const response = await axios.post(`${API_BASE_URL}/api/images/upload`, formData, {
-    //     headers: {
-    //       "Content-Type": "multipart/form-data",
-    //       Authorization: `Bearer ${idToken}`,
-    //     },
-    //   });
-
-    //   const uploadedImages: ImageData[] = response.data.images.map(
-    //     (image: any) => ({
-    //       id: image.imageId,
-    //       originalFileName: image.originalFileName,
-    //       url: image.presignedUrl,
-    //       status: "pending",
-    //     })
-    //   );
-    //   console.log(uploadedImages);
-
-    //   setImages((prevImages) => [...prevImages, ...uploadedImages]);
-    //   handleProcessAll(uploadedImages);
-    // } catch (error) {
-    //   console.error("Upload failed:", error);
-    // } finally {
-    //   setUploading(false);
-    // }
   };
 
   // Process all newly uploaded images
