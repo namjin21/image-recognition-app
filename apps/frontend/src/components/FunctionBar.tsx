@@ -8,6 +8,7 @@ interface FunctionBarProps {
   setSelectionMode: (value: boolean) => void;
   handleDeleteSelected: () => void;
   selectedImageIds: string[];
+  toggleSelectAll: () => void;
   clearSelection: () => void;
   handleSearch: (event: any) => void;
 }
@@ -18,6 +19,7 @@ const FunctionBar: React.FC<FunctionBarProps> = ({
   setSelectionMode,
   handleDeleteSelected,
   selectedImageIds,
+  toggleSelectAll,
   clearSelection,
   handleSearch,
 }) => {
@@ -30,6 +32,15 @@ const FunctionBar: React.FC<FunctionBarProps> = ({
         >
           <MdClose />
         </button>
+        
+      <button
+        onClick={toggleSelectAll}
+        className="px-3 py-1 bg-gray-200 rounded"
+      >
+        {selectedImageIds.length === images.length
+          ? "Unselect All"
+          : "Select All"}
+      </button>
         <span className="text-black">{selectedImageIds.length} selected</span>
         <button
           onClick={() => {

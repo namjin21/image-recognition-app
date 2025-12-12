@@ -149,7 +149,8 @@ const ImageUpload = () => {
 
     // setImages((prevImages) => [...prevImages, ...uploadedImages]);
     const end = performance.now();
-    console.log("여러 api call upload duration:", end - start, "ms");
+    console.log("서버 업로드 방식 - 사진 50장 (700MB) 업로드 시간:", end - start, "ms");
+    // console.log("프론트 presigned url 업로드 방식 - 사진 50장 (700MB) 업로드 시간:", end - start, "ms");
 
     setUploading(false);
   };
@@ -270,6 +271,16 @@ const ImageUpload = () => {
     setSelectionMode(false);
   };
 
+  const toggleSelectAll = () => {
+    if (!selectionMode) return;
+
+    if (selectedImageIds.length === filteredImages.length) {
+      setSelectedImageIds([]);
+    } else {
+      setSelectedImageIds(filteredImages.map((img) => img.id));
+    }
+  }
+
   return (
     <div className="m-4">
       <FunctionBar
@@ -278,6 +289,7 @@ const ImageUpload = () => {
             setSelectionMode={setSelectionMode}
             handleDeleteSelected={handleDeleteSelected}
             selectedImageIds={selectedImageIds}
+            toggleSelectAll={toggleSelectAll}
             clearSelection={clearSelection}
             handleSearch={handleSearch}
       />
