@@ -1,6 +1,6 @@
 import { DynamoDBClient, BatchWriteItemCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand, UpdateCommand, GetCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { generatePreSignedUrl } from "../utils/s3Utils.js";
+import { generateGetPresignedUrl } from "../utils/s3Utils.js";
 
 // Initialize the DynamoDB client
 const client = new DynamoDBClient({ region: process.env.AWS_REGION });
@@ -108,7 +108,7 @@ export const getAllMetadata = async (userId) => {
     const metadata = data.Items || [];
     const imagesData = await Promise.all(
       metadata.map(async (item) => {
-        const signedUrl = await generatePreSignedUrl(
+        const signedUrl = await generateGetPresignedUrl(
           process.env.S3_BUCKET_NAME,
           item.optimizedS3Key,
           urlExpiry
