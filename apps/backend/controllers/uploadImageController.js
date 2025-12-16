@@ -59,7 +59,6 @@ export const getPresignedUploadUrl = async (req, res) => {
       const originalS3Key = `${userId}/original/${uniqueId}.${ext}`;
   
       const uploadUrl = await generateUploadPresignedUrl(process.env.S3_BUCKET_NAME, originalS3Key, fileType);
-      console.log(`uploadUrl: ${uploadUrl}`)
   
       // optimized key (아직 파일 없음)
       const optimizedS3Key = convertToOptimizedS3Key(originalS3Key);
@@ -86,7 +85,12 @@ export const finalizeUpload = async (req, res) => {
         }
     
         const userId = req.user.id;
-    
+
+        // TODO: remove test code
+        console.log(
+          `[UPLOAD][PRESIGNED] user=${userId} imageId=${imageId} (no file bytes on server)`
+        );
+
         const optimizedS3Key = convertToOptimizedS3Key(originalS3Key);
     
         // DynamoDB에 최초 메타데이터 저장

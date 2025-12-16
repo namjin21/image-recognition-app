@@ -11,6 +11,19 @@ const app = express();
 app.use(cors());
 app.use(json());
 
+if (process.env.NODE_ENV !== "production") {
+    setInterval(() => {
+      const mu = process.memoryUsage();
+      console.log(
+        `[NODE] rssMB=${(mu.rss / 1024 / 1024).toFixed(1)} heapUsedMB=${(
+          mu.heapUsed /
+          1024 /
+          1024
+        ).toFixed(1)}`
+      );
+    }, 1000);
+}
+
 import uploadImageRoute from "./routes/images/uploadImageRoute.js";
 import deleteImageRoute from "./routes/images/deleteImageRoute.js";
 import metadataRoute from "./routes/images/metadataRoute.js";
