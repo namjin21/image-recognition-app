@@ -27,8 +27,6 @@ export async function generateUploadPresignedUrl(bucketName, objectKey, contentT
     expiresIn: expiresInSeconds,
   });
 
-  console.log(signedUrl)
-
   return signedUrl;
 }
 
