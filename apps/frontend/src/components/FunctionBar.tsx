@@ -25,33 +25,38 @@ const FunctionBar: React.FC<FunctionBarProps> = ({
 }) => {
   if (selectionMode) {
     return (
-      <div className="flex justify-between items-center bg-gray-100 p-3 -mt-3 -mx-3 mb-4 shadow">
-        <button
-          className="text-black px-1.5 py-1.5 rounded-full cursor-pointer hover:bg-gray-200"
-          onClick={clearSelection}
-        >
-          <MdClose />
-        </button>
-        
-      <button
-        onClick={toggleSelectAll}
-        className="px-3 py-1 bg-gray-200 rounded"
-      >
-        {selectedImageIds.length === images.length
-          ? "Unselect All"
-          : "Select All"}
-      </button>
-        <span className="text-black">{selectedImageIds.length} selected</span>
-        <button
-          onClick={() => {
-            // TODO: add confirmation popup
-            handleDeleteSelected();
-          }}
-          disabled={selectedImageIds.length === 0}
-          className="text-gray-600 px-2 py-2 rounded-full cursor-pointer hover:bg-gray-200 disabled:cursor-not-allowed"
-        >
-          <FaRegTrashCan />
-        </button>
+      <div className="relative flex items-center bg-gray-100 p-3 -mt-3 -mx-3 mb-4 shadow">
+        <div className="flex items-center gap-2">
+            <button
+              className="text-black px-1.5 py-1.5 rounded-full cursor-pointer hover:bg-gray-200"
+              onClick={clearSelection}
+            >
+              <MdClose />
+            </button>
+            
+          <button
+            onClick={toggleSelectAll}
+            className="px-3 py-1 rounded-2xl cursor-pointer hover:bg-gray-300 bg-gray-200 text-gray-800 "
+          >
+            {selectedImageIds.length === images.length
+              ? "Unselect All"
+              : "Select All"}
+          </button>
+          
+        </div>
+        <span className="absolute left-1/2 -translate-x-1/2 text-black">{selectedImageIds.length} selected</span>
+        <div className="ml-auto">
+          <button
+            onClick={() => {
+              // TODO: add confirmation popup
+              handleDeleteSelected();
+            }}
+            disabled={selectedImageIds.length === 0}
+            className="text-gray-600 px-2 py-2 rounded-full cursor-pointer hover:bg-gray-200 disabled:cursor-not-allowed"
+          >
+            <FaRegTrashCan />
+          </button>
+        </div>
       </div>
     );
   }

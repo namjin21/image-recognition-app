@@ -16,8 +16,8 @@ export const analyzeImage = async (req, res) => {
     try {
         const labels = await generateImageLabels(userId, imageId);
         const {category, mood, story} = await generateStory(labels);
-        await setAnalysis(userId, imageId, labels, category, mood, story);
         const optimizedKey = await getOptimizedS3Key(userId, imageId);
+        await setAnalysis(userId, imageId, labels, category, mood, story, optimizedKey);
         const optimizedPresignedUrl = await generateGetPresignedUrl(process.env.S3_BUCKET_NAME, optimizedKey, urlExpiry);
 
         res.json({ 
