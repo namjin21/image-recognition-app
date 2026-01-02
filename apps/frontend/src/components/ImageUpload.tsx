@@ -21,7 +21,6 @@ export interface ImageData {
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const MAX_PARALLEL_UPLOADS = 100;
 
 const ImageUpload = () => {
   const { userId, loading, idToken } = useUser();
