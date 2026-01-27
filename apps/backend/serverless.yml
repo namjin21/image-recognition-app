@@ -1,0 +1,22 @@
+service: image-recognition-app
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  region: ap-southeast-2
+  environment:
+    S3_BUCKET_NAME: my-s3-bucket-6005
+    DYNAMODB_TABLE_NAME: ImageMetadata
+    IS_OFFLINE: ${env:IS_OFFLINE, 'false'}
+
+functions:
+  api:
+    handler: app.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: any
+          cors: true
+
+plugins:
+  - serverless-offline
