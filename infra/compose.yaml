@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: apps/backend/Dockerfile
+    container_name: imageteller-backend
+    expose:
+      - "3000"          # 내부 서비스용 포트
+    ports:
+      - "8080:3000"
+    environment:
+      NODE_ENV: production
+      AWS_REGION: ap-southeast-2
+      DYNAMODB_TABLE: ImageMetadata
+    env_file:
+      - ../apps/backend/.env            # AWS 키 등
+    restart: unless-stopped
+    networks:
+      - imageteller-net
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: apps/frontend/Dockerfile
+      args:
+        - VITE_API_URL=
+    container_name: imageteller-frontend
+    ports:
+      - "80:80"         # 외부 유일 진입점
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - imageteller-net
+
+networks:
+  imageteller-net:
+    driver: bridge
